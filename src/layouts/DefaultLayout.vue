@@ -36,18 +36,108 @@
       <slot></slot>
     </main>
     <footer-partial></footer-partial>
+    <modal :show="modals.login" @close-modal="closeLoginModal">
+      <h2 class="text-grey-darkest font-semibold text-center mb-6">
+        Welcome to Platzi Rooms
+      </h2>
+      <form>
+        <div class="mb-4">
+          <label for="input__label">Email</label>
+          <div class="form__field relative">
+            <input class="input__field" type="text" placeholder="Email" />
+          </div>
+        </div>
+        <div class="mb-4">
+          <label for="input__label">Password</label>
+          <div class="form__field relative">
+            <input class="input__field" type="password" placeholder="Password" />
+          </div>
+        </div>
+        <div class="mb-4">
+          <button type="" class="btn btn-primary mr-3 w-full">Login</button>
+        </div>
+      </form>
+    </modal>
+    <modal :show="modals.register" @close-modal="closeRegisterModal">
+      <h2 class="text-grey-darkest font-semibold text-center mb-6">
+        Register on Platzi Rooms
+      </h2>
+      <form>
+        <div class="mb-4">
+          <label for="input__label">Email</label>
+          <div class="form__field relative">
+            <input v-model="formLogin.email" class="input__field" type="text" placeholder="Email" />
+          </div>
+        </div>
+        <div class="mb-4">
+          <label for="input__label">Password</label>
+          <div class="form__field relative">
+            <input
+              v-model="formLogin.password"
+              class="input__field"
+              type="password"
+              placeholder="Password"
+            />
+          </div>
+        </div>
+        <div class="mb-4">
+          <toggle-input
+            :toggled="formLogin.rememberMe"
+            @toggle="formLogin.rememberMe = $event"
+          ></toggle-input>
+          Remember Me
+          <!-- <toggle-input
+            v-model="formLogin.rememberMe"
+          ></toggle-input> -->
+        </div>
+        <div class="mb-4">
+          <button type="" class="btn btn-primary mr-3 w-full">Register</button>
+        </div>
+      </form>
+    </modal>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import HeaderPartial from '@/partials/HeaderPartial.vue'
 import FooterPartial from '@/partials/FooterPartial.vue'
+import ToggleInput from '@/components/ToggleInput.vue'
+import Modal from '@/components/Modal.vue'
 
 export default {
   name: 'DefaultLayout',
+  data() {
+    return {
+      formLogin: {
+        email: '',
+        password: '',
+        rememberMe: false,
+      },
+    }
+  },
+  computed: {
+    ...mapGetters(['modals']),
+  },
   components: {
     HeaderPartial,
     FooterPartial,
+    Modal,
+    ToggleInput,
+  },
+  methods: {
+    closeLoginModal() {
+      this.$store.dispatch('TOGGLE_MODAL_STATE', {
+        name: 'login',
+        value: false,
+      })
+    },
+    closeRegisterModal() {
+      this.$store.dispatch('TOGGLE_MODAL_STATE', {
+        name: 'register',
+        value: false,
+      })
+    },
   },
 }
 </script>

@@ -19,7 +19,7 @@ export default createStore({
       state.modals[name] = value
     },
     SET_ROOM(state, { newRoom, roomId }) {
-      state.rooms = { ...state.rooms, roomId, newRoom }
+      state.rooms = { ...state.rooms, [roomId]: newRoom }
     },
     APPEND_ROOM_TO_USER(state, { roomId, userId }) {
       // @ts-ignore

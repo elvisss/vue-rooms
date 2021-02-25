@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import store from '../store'
 import HomePage from '../views/HomePage.vue'
 import SearchPage from '../views/SearchPage.vue'
 import NotFoundPage from '../views/NotFoundPage.vue'
@@ -29,6 +30,9 @@ const routes: Array<RouteRecordRaw> = [
     path: '/house/new',
     name: 'CreateHousePage',
     component: CreateHousePage,
+    meta: {
+      requiresAuth: true,
+    },
   },
   {
     path: '/user',
@@ -38,11 +42,17 @@ const routes: Array<RouteRecordRaw> = [
     path: '/user/profile',
     name: 'ProfilePage',
     component: ProfilePage,
+    meta: {
+      requiresAuth: true,
+    },
   },
   {
     path: '/user/houses',
     name: 'HousesPages',
     component: HousesPages,
+    meta: {
+      requiresAuth: true,
+    },
   },
   {
     path: '/:pathMatch(.*)*',
@@ -54,6 +64,18 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
+})
+
+router.beforeEach((to, _from, next) => {
+  if (to.matched.some(route => route.meta.requiresAuth)) {
+    if (store.state.authId) {
+      next()
+    } else {
+      next({ name: 'HomePage' })
+    }
+  } else {
+    next()
+  }
 })
 
 export default router

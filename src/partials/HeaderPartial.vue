@@ -28,7 +28,11 @@
                   alt="Avatar of Javier Diaz"
                 />
                 <div class="text-sm">
-                  <p class="text-black leading-none">{{ user.name }}</p>
+                  <p class="text-black leading-none">
+                    <router-link to="/user" class="text-black no-underline leading-none">
+                      {{ user.name }}
+                    </router-link>
+                  </p>
                   <p class="text-grey-dark">Online</p>
                 </div>
               </div>

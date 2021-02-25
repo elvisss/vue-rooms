@@ -172,7 +172,7 @@ export default createStore({
     modals: state => state.modals,
     authUser: state => {
       // @ts-ignore
-      return (state.authId ? state.users[state.authId] : null)
+      return state.authId ? state.users[state.authId] : null
     },
     rooms: state => state.rooms,
     userRoomsCount: state => (id: any) => {

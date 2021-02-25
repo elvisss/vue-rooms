@@ -34,9 +34,19 @@
             ></textarea>
           </div>
           <div class="mb-4">
+            <label for="" class="input__label">Services</label>
+            <check-box
+              v-for="service in services"
+              :key="service['.key']"
+              :label="service.name"
+              :identity="service['.key']"
+              @changed="checked"
+            ></check-box>
+          </div>
+          <div class="mb-4">
             <label for="" class="input__label">Featured Image</label>
             <input
-              v-model="publication.featuredImage"
+              v-model="publication.featured_image"
               class="input__field"
               placeholder="URL"
               type="text"
@@ -57,30 +67,51 @@
 </template>
 
 <script>
+/* eslint-disable @typescript-eslint/camelcase */
+import { mapGetters } from 'vuex'
 import PageLayout from '@/layouts/PageLayout.vue'
+import CheckBox from '@/components/CheckBox.vue'
 
 export default {
   name: 'CreateHousePage',
+  beforeCreate() {
+    this.$store.dispatch('FETCH_SERVICES')
+  },
   data() {
     return {
       publication: {
-        title: 'a',
-        description: 'b',
-        featuredImage: 'c',
+        title: '',
+        description: '',
+        featured_image: '',
+        services: {},
       },
     }
   },
-  components: { PageLayout },
+  computed: {
+    ...mapGetters(['services']),
+  },
+  components: {
+    PageLayout,
+    CheckBox,
+  },
   methods: {
     savePublication() {
-      const { title, description, featuredImage } = this.publication
+      const { title, description, featured_image, services } = this.publication
       const room = {
         title,
         description,
-        featuredImage,
+        featured_image,
+        services,
         publishedAt: Date.now(),
       }
       this.$store.dispatch('CREATE_ROOM', room)
+    },
+    checked($event) {
+      if ($event.checked) {
+        this.publication.services[$event.id] = $event.id
+      } else {
+        delete this.publication.services[$event.id]
+      }
     },
   },
 }

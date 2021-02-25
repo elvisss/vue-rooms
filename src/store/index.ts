@@ -7,7 +7,7 @@ export default createStore({
     users: {},
     services: {},
     rooms: {},
-    authId: '38St7Q8Zi2N1SPa5ahzssq9kbyp1',
+    authId: null,
     modals: {
       login: false,
       register: false,
@@ -31,6 +31,9 @@ export default createStore({
       console.log({ newItem })
       // @ts-ignore
       state[resource] = { ...state[resource], [id]: newItem }
+    },
+    SET_AUTH_ID(state, id) {
+      state.authId = id
     },
   },
   actions: {
@@ -96,7 +99,6 @@ export default createStore({
           .ref('users')
           .child(id)
           .once('value', (snapshot: any) => {
-            console.log(snapshot.key, snapshot.val())
             commit('SET_ITEM', { resource: 'users', id: snapshot.key, item: snapshot.val() })
             // @ts-ignore
             resolve(state.users[id])
@@ -107,30 +109,78 @@ export default createStore({
         firebase
           .database()
           .ref('services')
-          .once('value', snapshot => {
-            const services = snapshot.val()
-            Object.keys(services).forEach(serviceId => {
-              const service = services[serviceId]
-              commit('SET_ITEM', { resource: 'services', id: serviceId, item: service })
-            })
-            resolve(Object.values(state.services))
-          }, err => {
-            reject(err)
+          .once(
+            'value',
+            snapshot => {
+              const services = snapshot.val()
+              Object.keys(services).forEach(serviceId => {
+                const service = services[serviceId]
+                commit('SET_ITEM', { resource: 'services', id: serviceId, item: service })
+              })
+              resolve(Object.values(state.services))
+            },
+            err => {
+              reject(err)
+            }
+          )
+      }),
+    CREATE_USER: ({ state, commit }, { email, name, password }) =>
+      new Promise((resolve, reject) => {
+        firebase
+          .auth()
+          .createUserWithEmailAndPassword(email, password)
+          .then(account => {
+            if (account.user !== null) {
+              const id = account.user.uid
+              const registeredAt = Math.floor(Date.now() / 1000)
+              const newUser = { email, name, registeredAt }
+              firebase
+                .database()
+                .ref('users')
+                .child(id)
+                .set(newUser)
+                .then(() => {
+                  commit('SET_ITEM', { resource: 'users', id, item: newUser })
+                  // @ts-ignore
+                  resolve(state.users[id])
+                })
+            } else {
+              reject('Unable to get user')
+            }
           })
       }),
+    FETCH_AUTH_USER: ({ dispatch, commit }) => {
+      const userId = firebase.auth().currentUser?.uid
+      if (userId) {
+        return dispatch('FETCH_USER', { id: userId }).then(() => {
+          commit('SET_AUTH_ID', userId)
+        })
+      }
+    },
+    SIGN_IN(_context, { email, password }) {
+      return firebase.auth().signInWithEmailAndPassword(email, password)
+    },
+    LOG_OUT({ commit }) {
+      firebase
+        .auth()
+        .signOut()
+        .then(() => {
+          commit('SET_AUTH_ID', null)
+        })
+    },
   },
   getters: {
     modals: state => state.modals,
     authUser: state => {
       // @ts-ignore
-      return state.users[state.authId]
+      return (state.authId ? state.users[state.authId] : null)
     },
     rooms: state => state.rooms,
     userRoomsCount: state => (id: any) => {
       // @ts-ignore
       return countObjectProperties(state.users[id].rooms)
     },
-    services: state => state.services
+    services: state => state.services,
   },
   modules: {},
 })

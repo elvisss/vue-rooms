@@ -1,5 +1,6 @@
 import firebase from 'firebase/app'
 import 'firebase/database'
+import 'firebase/auth'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
@@ -16,6 +17,12 @@ const firebaseConfig = {
 }
 
 firebase.initializeApp(firebaseConfig)
+
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    store.dispatch('FETCH_AUTH_USER')
+  }
+})
 
 createApp(App)
   .use(store)

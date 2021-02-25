@@ -40,29 +40,7 @@
       <h2 class="text-grey-darkest font-semibold text-center mb-6">
         Welcome to Platzi Rooms
       </h2>
-      <form>
-        <div class="mb-4">
-          <label for="input__label">Email</label>
-          <div class="form__field relative">
-            <input class="input__field" type="text" placeholder="Email" />
-          </div>
-        </div>
-        <div class="mb-4">
-          <label for="input__label">Password</label>
-          <div class="form__field relative">
-            <input class="input__field" type="password" placeholder="Password" />
-          </div>
-        </div>
-        <div class="mb-4">
-          <button type="" class="btn btn-primary mr-3 w-full">Login</button>
-        </div>
-      </form>
-    </modal>
-    <modal :show="modals.register" @close-modal="closeRegisterModal">
-      <h2 class="text-grey-darkest font-semibold text-center mb-6">
-        Register on Platzi Rooms
-      </h2>
-      <form>
+      <form @submit.prevent="signinSubmit">
         <div class="mb-4">
           <label for="input__label">Email</label>
           <div class="form__field relative">
@@ -91,7 +69,50 @@
           ></toggle-input> -->
         </div>
         <div class="mb-4">
-          <button type="" class="btn btn-primary mr-3 w-full">Register</button>
+          <button type="submit" class="btn btn-primary mr-3 w-full">Login</button>
+        </div>
+      </form>
+    </modal>
+    <modal :show="modals.register" @close-modal="closeRegisterModal">
+      <h2 class="text-grey-darkest font-semibold text-center mb-6">
+        Register on Platzi Rooms
+      </h2>
+      <form @submit.prevent="signupSubmit">
+        <div class="mb-4">
+          <label for="input__label">Email</label>
+          <div class="form__field relative">
+            <input
+              v-model="formRegister.email"
+              class="input__field"
+              type="text"
+              placeholder="Email"
+            />
+          </div>
+        </div>
+        <div class="mb-4">
+          <label for="input__label">Name</label>
+          <div class="form__field relative">
+            <input
+              v-model="formRegister.name"
+              class="input__field"
+              type="text"
+              placeholder="Name"
+            />
+          </div>
+        </div>
+        <div class="mb-4">
+          <label for="input__label">Password</label>
+          <div class="form__field relative">
+            <input
+              v-model="formRegister.password"
+              class="input__field"
+              type="password"
+              placeholder="Password"
+            />
+          </div>
+        </div>
+        <div class="mb-4">
+          <button type="submit" class="btn btn-primary mr-3 w-full">Register</button>
         </div>
       </form>
     </modal>
@@ -110,9 +131,14 @@ export default {
   data() {
     return {
       formLogin: {
-        email: '',
-        password: '',
+        email: 'elvis.saavedra.segura@gmail.com',
+        password: '123456',
         rememberMe: false,
+      },
+      formRegister: {
+        email: '',
+        name: '',
+        password: '',
       },
     }
   },
@@ -137,6 +163,27 @@ export default {
         name: 'register',
         value: false,
       })
+    },
+    signinSubmit() {
+      this.$store
+        .dispatch('SIGN_IN', this.formLogin)
+        .then(() => {
+          this.closeLoginModal()
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    signupSubmit() {
+      this.$store
+        .dispatch('CREATE_USER', this.formRegister)
+        .then(data => {
+          this.$store.dispatch('FETCH_USER', data.uid)
+          this.closeRegisterModal()
+        })
+        .catch(err => {
+          console.log(err)
+        })
     },
   },
 }

@@ -3,9 +3,12 @@
 </template>
 
 <script>
+import store from './store'
 export default {
   beforeCreate() {
-    this.$store.dispatch('FETCH_USER', { id: '38St7Q8Zi2N1SPa5ahzssq9kbyp1' })
+    if (store.state.authId) {
+      this.$store.dispatch('FETCH_USER', { id: store.state.authId })
+    }
   },
 }
 </script>

@@ -28,7 +28,6 @@ export default createStore({
     SET_ITEM(state, { item, id, resource }) {
       const newItem = item
       newItem['.key'] = id
-      console.log({ newItem })
       // @ts-ignore
       state[resource] = { ...state[resource], [id]: newItem }
     },

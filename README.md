@@ -1,4 +1,5 @@
 # vue-rooms
+[Link to the application](https://vue-rooms.herokuapp.com/)
 
 ## Project setup
 ```

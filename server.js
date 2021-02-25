@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const express = require('express')
-const port = process.env.PROT || 8080
+const port = process.env.PORT || 8080
 
 const app = express()
 
